@@ -1,5 +1,5 @@
 # ---- Build stage ----
-FROM python:3.14.6-slim AS builder
+FROM python:3.14.6-slim-bookworm AS builder
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
 # ---- Final stage ----
-FROM python:3.14.6-slim
+FROM python:3.14.6-slim-bookworm
 
 # Create a non-root user and group
 RUN groupadd --gid 1000 appuser && \
