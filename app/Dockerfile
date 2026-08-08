@@ -1,5 +1,5 @@
 # ---- Build stage ----
-FROM python:3.14.6-slim-bookworm AS builder
+FROM python:3.14.6-alpine3.24 AS builder
 
 WORKDIR /app
 
@@ -7,22 +7,19 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
 # ---- Final stage ----
-FROM python:3.14.6-slim-bookworm
+FROM python:3.14.6-alpine3.24
 
-# Create a non-root user and group
-RUN groupadd --gid 1000 appuser && \
-    useradd --uid 1000 --gid appuser --shell /bin/false --no-create-home appuser
+# Alpine uses busybox — no groupadd/useradd; use addgroup/adduser instead
+RUN addgroup -g 1000 appuser && \
+    adduser -D -H -u 1000 -G appuser -s /sbin/nologin appuser
 
 WORKDIR /app
 
-# Copy only the installed packages from the builder stage, not build tools
 COPY --from=builder /root/.local /home/appuser/.local
 COPY app.py .
 
-# Make sure the non-root user's installed packages are on PATH
 ENV PATH=/home/appuser/.local/bin:$PATH
 
-# Drop root privileges
 USER appuser
 
 EXPOSE 5000
