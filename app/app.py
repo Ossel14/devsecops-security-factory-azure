@@ -3,8 +3,10 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-API_KEY = os.environ.get("API_KEY", "dev-only-placeholder-key")
+API_KEY = os.environ.get("API_KEY")
 
+if not API_KEY:
+    raise RuntimeError("Missing required environment variable: API_KEY")
 
 def require_api_key(f):
     def wrapper(*args, **kwargs):
@@ -12,6 +14,7 @@ def require_api_key(f):
         if key != API_KEY:
             return jsonify({"error": "unauthorized"}), 401
         return f(*args, **kwargs)
+
     wrapper.__name__ = f.__name__
     return wrapper
 
@@ -28,4 +31,4 @@ def secure_data():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)  # nosemgrep: python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host -- required for container networking, low risk pre-deployment
+    app.run(host="127.0.0.1", port=5000)

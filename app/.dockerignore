@@ -1,6 +1,23 @@
+# Local Python environments and generated files
 venv/
-__pycache__/
-*.pyc
-tests/
+.venv/
+**/__pycache__/
+*.py[cod]
 .pytest_cache/
+.coverage
+htmlcov/
+
+# Files unnecessary for the runtime image
+tests/
+requirements-dev.txt
 .git/
+
+# Local configuration and credentials
+.env
+.env.*
+**/.env
+**/.env.*
+.aws/
+**/.aws/
+*.pem
+*.key
