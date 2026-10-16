@@ -9,6 +9,9 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 # ---- Final stage ----
 FROM python:3.14.6-alpine3.24
 
+# Update affected runtime libraries from the configured Alpine repositories
+RUN apk upgrade --no-cache libcrypto3 libssl3 libuuid
+
 # Alpine uses busybox — no groupadd/useradd; use addgroup/adduser instead
 RUN addgroup -g 1000 appuser && \
     adduser -D -H -u 1000 -G appuser -s /sbin/nologin appuser
