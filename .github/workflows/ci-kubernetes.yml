@@ -1,0 +1,32 @@
+name: CI Kubernetes
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-manifests:
+    name: Validate Kubernetes manifests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Validate manifests with kubeconform
+        run: |
+          docker run --rm \
+            --mount "type=bind,source=${GITHUB_WORKSPACE}/k8s,target=/manifests,readonly" \
+            --entrypoint /kubeconform \
+            ghcr.io/yannh/kubeconform:v0.8.0 \
+            -strict \
+            -summary \
+            -verbose \
+            -kubernetes-version 1.37.0 \
+            /manifests
